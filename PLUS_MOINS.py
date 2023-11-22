@@ -13,7 +13,8 @@ def Higher_Lower():
     while attempt > 0:
         print( attempt,"attempt left! ")
         a = ask_int()
-        Compare(a,result,attempt)
+        print(Compare(a,result,attempt))
+
         attempt -= 1
         att += 1
     Ending(False,attempt,result)
@@ -71,11 +72,8 @@ def try_again(T):
     else:
         Start(True)
 
-def Start(restart): 
-    start = True
+def Start(start): 
     while start == True:
-        if restart == False:
-            break
         start = Higher_Lower()
     print("Game Over")
         
