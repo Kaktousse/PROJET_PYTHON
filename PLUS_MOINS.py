@@ -4,29 +4,29 @@ import random
 def Higher_Lower():
 
     print("Set a maximum for the random number (min. 10) : ")
-
+    W = False
     given_range = ask_int_10()
     result:int = random.randint(1,given_range)
     attempt:int = 10
     att = 0
 
-    while attempt > 0:
+    while attempt > 0 and W != True:
         print( attempt,"attempt left! ")
         a = ask_int()
-        print(Compare(a,result,attempt))
-
+        W = Compare(a,result,attempt,W)
         attempt -= 1
         att += 1
-    Ending(False,attempt,result)
+    return Ending(W,attempt,result)
 
 
-def Compare(a,result,attempts):
+def Compare(a,result,attempts,W):
     if a == result:
-        return Ending(True,attempts,result)
+        W = True
+        return W
     elif a > result:
-        return "Lower"
+        return print("Lower")
     elif a < result:
-        return "Higher"
+        return print("Higher")
 
 
 
@@ -35,12 +35,12 @@ def Ending(Win,attempts,result):
         print("Well done you did it in ", attempts , " attempts.")
         print("Do you want to retry ?")
         retry:str = ask_str(['Y','N','y','n'])
-        try_again(retry)
+        return try_again(retry)
     else:
         print("You loose the number was",result,".")
         print("Do you want to retry ?")
         retry:str = ask_str(['Y','N','y','n'])
-        try_again(retry)
+        return try_again(retry)
 
 
 
@@ -68,9 +68,9 @@ def ask_str(sPosibilities: list) -> str:
 
 def try_again(T):
     if T =='N' or T == 'n':
-        Start(False)
+        return False
     else:
-        Start(True)
+       return True
 
 def Start(start): 
     while start == True:
