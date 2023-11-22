@@ -1,45 +1,48 @@
 import random
 
 
-def Shifumi(round):
+
+def Shifumi():
+
+    tab_win : list = [  [""          , "Rock" , "Paper", "Scissors"         ],
+                        [" Rock "     , "Tie"  , "You win"  , "You loose"   ],
+                        [" Paper "    , "You loose", "Tie"  , "You win"     ],
+                        [" Scissors " , "You win"  , "You loose", "Tie"     ]]
+    tab_points : list = [  [""          , "Rock" , "Paper", "Scissors"         ],
+                        [" Rock "     , 2  , 0  , 1   ],
+                        [" Paper "    , 1, 2  , 0     ],
+                        [" Scissors " , 0  , 1, 2     ]] 
     print("Let's play Rock, Paper Scissors !")
+    print("How many rounds do you want to do ?")
+    round = Ask_int()
     choice:list = ["rock","paper","scissors"]
-    Wins:list = [0,0]
+    Wins:list = [0,0,0]
+
     for i in range(round):
-        Bot:int = random.randint(0,2)
+
+        Bot:int = random.randint(1,3)
         print("Choose : Rock (1), Paper (2) or Scissors (3) .")
-        player:int = ask_int_1_3() - 1
-        Winner = Win(Bot,player,Wins)
-        print(choice[Bot],"vs",choice[player],Winner)
-    Results:str = Win(Bot,player,Wins,True)
+        player:int = Ask_int_1_3()
+        Winner = tab_win[player][Bot]
+        print(tab_points[player][Bot])
+        Wins[tab_points[player][Bot]] += 1
+        print(choice[Bot-1],"vs",choice[player-1],Winner)
+
+    Results:str = Win(Wins)
     print(Results,Wins[0],"/",Wins[1],"!")
-    print("Do you want to retry ?")
-    retry:str = ask_str(['Y','N'])
-    try_again(retry)
 
 
 
-def Win(A,B,Points,end):
-    if end == True:
-        if Points[0] == Points[1]:
-            return "It's a Tie "
-        elif Points[0]>Points[1]:
-            return "You Win "
-        else :
-            return "You Loose "
-        
-    else:
-        if A == B :
-            return "It' s a Tie"
-        elif (A == 0 and B == 1) or (A == 1 and B == 2) or (A == 2 and B == 0):
-            Points[0]+=1
-            return "You Win !"
-        elif (B == 0 and A == 1) or (B == 1 and A == 2) or (B == 2 and A == 0):
-            Points[1]+=1
-            return "You Loose !"
+def Win(Points,):
+    if Points[0] == Points[1]:
+        return "It's a Tie "
+    elif Points[0]>Points[1]:
+        return "You Win "
+    else :
+        return "You Loose "
 
 
-def ask_int_1_3():
+def Ask_int_1_3():
     while True :
         given_int = input("Choose a number : ")
         if given_int.isdigit():
@@ -47,36 +50,34 @@ def ask_int_1_3():
             if given_int > 0 and given_int < 4: 
                 return given_int
              
-def ask_int():
+def Ask_int():
     while True :
         given_int = input("Choose a number : ")
         if given_int.isdigit():
                 given_int = int(given_int)
                 return given_int
 
-def ask_str(sPosibilities: list):
+def Ask_str(sPossibilities: list):
     while True:
-        print("Please enter ",sPosibilities,")")
+        print("Please enter ", sPossibilities,")")
         given_input:str = input(": ")   
-        for element in sPosibilities:
+        for element in sPossibilities:
             if element == given_input:
                 return given_input
 
 
-def try_again(T):
-    if T =='N' or T == 'n':
-        Start(False)
-    else:
-        Start(True)
+def Try_again(T):
+    return T != 'N'
 
-def Start(restart): 
-    start = True
+def Start():
+    start: bool = True 
     while start == True:
-        if restart ==False:
-            break
-        print("How many rounds do you want to do ?")
-        R = ask_int()
-        Shifumi(R)
+        Shifumi()
+        print("Do you want to retry ?")
+        retry:str = Ask_str(['Y','N'])
+        start = Try_again(retry)
     print("Game Over")
 
-Start(True)
+
+
+Start()
