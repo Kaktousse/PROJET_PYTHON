@@ -4,42 +4,45 @@ import random
 
 def Shifumi():
 
-    tab_win : list = [  [""          , "Rock" , "Paper", "Scissors"         ],
-                        [" Rock "     , "Tie"  , "You win"  , "You loose"   ],
-                        [" Paper "    , "You loose", "Tie"  , "You win"     ],
-                        [" Scissors " , "You win"  , "You loose", "Tie"     ]]
-    tab_points : list = [  [""          , "Rock" , "Paper", "Scissors"         ],
-                        [" Rock "     , 2  , 0  , 1   ],
-                        [" Paper "    , 1, 2  , 0     ],
-                        [" Scissors " , 0  , 1, 2     ]] 
+    tab_result : list = [  
+                            ["Tie"      , "You win"  , "You loose" ],
+                            ["You loose", "Tie"      , "You win"   ],
+                            ["You win"  , "You loose", "Tie"       ]
+                        ]
+    
+    tab_points : list = [
+                        [ 2  , 0  , 1 ],
+                        [ 1  , 2  , 0 ],
+                        [ 0  , 1  , 2 ]
+                        ] 
+    
     print("Let's play Rock, Paper Scissors !")
     print("How many rounds do you want to do ?")
     round = Ask_int()
     choice:list = ["rock","paper","scissors"]
     Wins:list = [0,0,0]
-
+    Who_Win : list = ["It's a Tie","You win","You loose"]
     for i in range(round):
 
-        Bot:int = random.randint(1,3)
-        print("Choose : Rock (1), Paper (2) or Scissors (3) .")
-        player:int = Ask_int_1_3()
-        Winner = tab_win[player][Bot]
-        print(tab_points[player][Bot])
+        Bot:int = random.randint(0,2)
+        print("\n Choose : Rock (1), Paper (2) or Scissors (3) .")
+        player:int = Ask_int_1_3() - 1
+        Winner = tab_result[player][Bot]
         Wins[tab_points[player][Bot]] += 1
-        print(choice[Bot-1],"vs",choice[player-1],Winner)
-
+        print(choice[Bot],"vs",choice[player],Winner)
+    
     Results:str = Win(Wins)
-    print(Results,Wins[0],"/",Wins[1],"!")
+    print(Who_Win[Results],Wins[0],"/",Wins[1],"!")
 
 
 
-def Win(Points,):
-    if Points[0] == Points[1]:
-        return "It's a Tie "
-    elif Points[0]>Points[1]:
-        return "You Win "
-    else :
-        return "You Loose "
+def Win(Points):
+    x = Points[0] ; y = Points[1]
+    res = x - y
+    while res != 0 and res!= 1 and res!= -1 :
+        y = abs(res)
+        res = res // y
+    return int(res)
 
 
 def Ask_int_1_3():
@@ -73,7 +76,7 @@ def Start():
     start: bool = True 
     while start == True:
         Shifumi()
-        print("Do you want to retry ?")
+        print("\n Do you want to retry ?")
         retry:str = Ask_str(['Y','N'])
         start = Try_again(retry)
     print("Game Over")
@@ -81,3 +84,6 @@ def Start():
 
 
 Start()
+
+
+
