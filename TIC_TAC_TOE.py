@@ -4,8 +4,8 @@ def Tictactoe():
         [ [],"|",[],"|",[] ],
         [ [],"|",[],"|",[] ]
     ]
-    end = False
-    while end != True :
+    end = True
+    while end == True :
         print(tab,"\n")
         print("Joueur 1 : Selectionnez la ligne dans laquelle vous voulez jouer")
         p1_lign:int = Ask_int_1_3()-1
