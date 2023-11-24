@@ -6,6 +6,7 @@ def Tictactoe():
     ]
     end = False
     while end != True :
+        print(tab,"\n")
         print("Joueur 1 : Selectionnez la ligne dans laquelle vous voulez jouer")
         p1_lign:int = Ask_int_1_3()-1
         print("Joueur 1 : Selectionnez la colonne dans laquelle vous voulez jouer")
@@ -13,7 +14,7 @@ def Tictactoe():
         p1_play : list = [p1_lign,p1_column]
         tab[p1_play[0],p1_play[1]].append("X")
 
-        print("Joueur 2 : Selectionnez la ligne dans laquelle vous voulez jouer")
+        print("\n Joueur 2 : Selectionnez la ligne dans laquelle vous voulez jouer")
         p2_lign:int = Ask_int_1_3()-1
         print("Joueur 2 : Selectionnez la colonne dans laquelle vous voulez jouer")
         p2_column:int = Ask_int_1_3()-1
