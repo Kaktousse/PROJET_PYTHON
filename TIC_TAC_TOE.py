@@ -109,67 +109,65 @@ def Check_Winning(grid,max,ally,enn):
     w = 0
     play = True
 
-    RAND :list = random.sample([1,2,3,4],4)
+    RAND = []
 
-    for randomizer in RAND:
-        if randomizer == 1:    
-            for i in range(3): 
-                w = 0 
-                for j in range(3) :
-                    if grid[i][j] == enn:
-                        w = 0
-                    elif grid[i][j] == ally : 
-                        w += 1
-                    if grid[i][j] == " ":
-                        play = [i,j]
-                if w >= max :
-            
-                    return play
-
-        if randomizer == 2:
-            w = 0 
-            for i in range(3):
-                w = 0 
-                for j in range(3):
-                    if grid[j][i] == enn:
-                        w = 0
-                    elif grid[j][i] == ally:
-                        w += 1
-                    if grid[j][i] == " ":
-                        play = [j,i]
-                if w >= max :
-            
-                    return play
+ 
+    for i in range(3): 
+        w = 0 
+        for j in range(3) :
+            if grid[i][j] == enn:
+                w = 0
+            elif grid[i][j] == ally : 
+                w += 1
+            if grid[i][j] == " ":
+                RAND.append([i,j])
+        if w >= max :
+    
+            return play
 
 
-        if randomizer == 3:
+    w = 0 
+    for i in range(3):
+        w = 0 
+        for j in range(3):
+            if grid[j][i] == enn:
+                w = 0
+            elif grid[j][i] == ally:
+                w += 1
+            if grid[j][i] == " ":
+                RAND.append([j,i])
+        if w >= max :
+    
+            return play
+
+
+    w = 0
+    for i in range(3):
+        if grid[i][i] == ally : 
+            w +=1
+        elif grid[i][i] == enn :
             w = 0
-            for i in range(3):
-                if grid[i][i] == ally : 
-                    w +=1
-                elif grid[i][i] == enn :
-                    w = 0
-                if grid[i][i] == " " : 
-                    play = [i,i]
-            if w >= max:
-        
-                return play
+        if grid[i][i] == " " : 
+            RAND.append([i,i])
+    if w >= max:
 
-        if randomizer == 4:
-            j =  2
-            w = 0 
-            for i in range(3):
-                if grid[i][j] == ally : 
-                    w +=1
-                elif grid[i][j] == enn :
-                    w = 0
-                if grid[i][j] == " " :
-                    play = [i,j]
-                j -=1
-            if w >= max: 
-        
-                return play
+        return play
 
+    j =  2
+    w = 0 
+    for i in range(3):
+        if grid[i][j] == ally : 
+            w +=1
+        elif grid[i][j] == enn :
+            w = 0
+        if grid[i][j] == " " :
+            RAND.append([i,j])
+        j -=1
+    if w >= max: 
+
+        return play
+    if enn == 5:
+        return RAND
 
     return False
     
@@ -179,14 +177,15 @@ def Bot(grid):
     not_empty = False
     Def = Check_Winning(grid,2,"X","O")
     Att = Check_Winning(grid,2,"O","X")
-    rand = Check_Winning(grid,1," ",4)
+    rand = Check_Winning(grid,1," ",5)
     
     if Att != False :
         b_play = Att
     elif Def != False:
         b_play = Def
     else:
-        b_play = rand
+        rand_inx = random.randint(0,len(rand)-1)
+        b_play = rand[rand_inx]
     return b_play
 
 
