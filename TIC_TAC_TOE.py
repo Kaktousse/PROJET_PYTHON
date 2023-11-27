@@ -1,10 +1,8 @@
 
 import random
 
-
-
 def Tictactoe():
-    tab : list = [
+    grid : list = [
         [" "," "," "],
         [" "," "," "],
         [" "," "," "]
@@ -12,7 +10,7 @@ def Tictactoe():
 
     while True:
         
-        draw(tab)
+        draw(grid)
         print("Joueur 1 : ")
         not_empty = False
         while not_empty == False:
@@ -20,69 +18,39 @@ def Tictactoe():
             p_lign:int = Ask_int_1_3()-1
             print("Selectionnez la colonne dans laquelle vous voulez jouer")
             p_column:int = Ask_int_1_3()-1
-            not_empty = check_empty(1,[p_lign,p_column],tab)        
-        tab[p_lign][p_column] = "X"
-        Win:str = verif(tab)
-        if Win != " ":
+            not_empty = check_empty(1,[p_lign,p_column],grid)        
+        grid[p_lign][p_column] = "X"
+        Win:bool = Check_Winning(grid,3,"X","O")
+        if Win : 
+            Winner = "X"
             break
-        end = Check_Tab(tab)
+        end = Check_grid(grid)
         if end == True : 
-            Win = "T"
+            Winner = "T"
             break
 
-        draw(tab)
-        p_bot = Bot(tab)
-        tab[p_bot[0]][p_bot[1]] = "O"
-        Win:str = verif(tab)
-        if Win != " ":
+        draw(grid)
+        p_bot = Bot(grid)
+        grid[p_bot[0]][p_bot[1]] = "O"
+        Win:bool = Check_Winning(grid,3,"O","X")
+        if Win : 
+            Winner = "O"
             break
-        end = Check_Tab(tab)
+        end = Check_grid(grid)
         if end == True : 
-            Win = "T"
+            Winner = "T"
             break
          
-    End(Win,tab)
-
-def End(Who,tab):
-    if Who == "X":
-        draw(tab)
-        return print("Player 1 Win !")
-    elif Who == "O":
-        draw(tab)
-        return print("Player 2 Win !")
-    elif Who == "T":
-        draw(tab)
-        return print("It's a Tie!")
+    End(Winner,grid)
 
 
-def Check_Tab(tab):
-    place_left = 0
-    for i in tab : 
-        for j in i :
-            if j == " ":
-                place_left += 1
-    if place_left == 0:
-        return True
+# --- The grid --- #
 
-def verif(tab:list):
-    Win:str = " "
-    for i in range(3):
-        if tab[0][i] == tab[1][i] == tab[2][i] and tab[0][i] != " ":
-            Win = tab[0][i]
-        if tab[i][0] == tab[i][1] == tab[i][2] and tab[i][0] != " ":
-            Win = tab[i][0]
-    if tab[0][0] == tab[1][1] == tab[2][2] and tab[0][0] != " ":
-        Win = tab[0][0]
-    if tab[0][2] == tab[1][1] == tab[2][0] and tab[0][2] != " ":
-        Win = tab[0][2]
-    return Win
-
-
-def draw(tab):
+def draw(grid):
     print("    1   2   3")
     print("  ","-"*13)
     x = 1
-    for ligne in tab:
+    for ligne in grid:
         separator = " | "
         L = separator.join(ligne)
         print(x,"|",L,"|")
@@ -90,19 +58,26 @@ def draw(tab):
         x += 1
 
 
-
-def check_empty(player,play,tab):
+def check_empty(player,play,grid):
     while True:
-            if tab[play[0]][play[1]] == " ":
+            if grid[play[0]][play[1]] == " ":
                 return True
             if player == 1:
                 print("\n")
-                draw(tab)
+                draw(grid)
                 print("Joueur ",player," :")
                 print("Veuillez selectionner une case libre : ")
             return False
             
-        
+def Check_grid(grid):
+    place_left = 0
+    for i in grid : 
+        for j in i :
+            if j == " ":
+                return False
+    return True
+
+# --- All Ask --- #
 
 def Ask_int_1_3():
     while True :
@@ -126,9 +101,110 @@ def Ask_str(sPossibilities: list):
             if element == given_input:
                 return given_input
 
+
+# --- --- #
+
+
+def Check_Winning(grid,max,ally,enn):
+    w = 0
+    play = True
+
+    RAND :list = random.sample([1,2,3,4],4)
+
+    for randomizer in RAND:
+        if randomizer == 1:    
+            for i in range(3): 
+                w = 0 
+                for j in range(3) :
+                    if grid[i][j] == enn:
+                        w = 0
+                    elif grid[i][j] == ally : 
+                        w += 1
+                    if grid[i][j] == " ":
+                        play = [i,j]
+                if w >= max :
+            
+                    return play
+
+        if randomizer == 2:
+            w = 0 
+            for i in range(3):
+                w = 0 
+                for j in range(3):
+                    if grid[j][i] == enn:
+                        w = 0
+                    elif grid[j][i] == ally:
+                        w += 1
+                    if grid[j][i] == " ":
+                        play = [j,i]
+                if w >= max :
+            
+                    return play
+
+
+        if randomizer == 3:
+            w = 0
+            for i in range(3):
+                if grid[i][i] == ally : 
+                    w +=1
+                elif grid[i][i] == enn :
+                    w = 0
+                if grid[i][i] == " " : 
+                    play = [i,i]
+            if w >= max:
+        
+                return play
+
+        if randomizer == 4:
+            j =  2
+            w = 0 
+            for i in range(3):
+                if grid[i][j] == ally : 
+                    w +=1
+                elif grid[i][j] == enn :
+                    w = 0
+                if grid[i][j] == " " :
+                    play = [i,j]
+                j -=1
+            if w >= max: 
+        
+                return play
+
+
+    return False
+    
+# --- Bot --- #
+
+def Bot(grid):
+    not_empty = False
+    Def = Check_Winning(grid,2,"X","O")
+    Att = Check_Winning(grid,2,"O","X")
+    rand = Check_Winning(grid,1," ",4)
+    
+    if Att != False :
+        b_play = Att
+    elif Def != False:
+        b_play = Def
+    else:
+        b_play = rand
+    return b_play
+
+
+# --- Running the Game --- #
+
+def End(Who,grid):
+    if Who == "X":
+        draw(grid)
+        print("Player 1 Win !")
+    elif Who == "O":
+        draw(grid)
+        print("Player 2 Win !")
+    elif Who == "T":
+        draw(grid)
+        print("It's a Tie!")
+
 def Try_again(T):
     return T != 'N'
-
 
 def Start(start): 
     while start == True:
@@ -138,100 +214,6 @@ def Start(start):
         start = Try_again(retry)
     print("Game Over")
 
-
-def Check_Winning(tab,max,enn,ally):
-    w = 0 
-    for i in tab: 
-        w = 0 
-        for j in i :
-            if j == ally:
-                w = 0
-            if j == enn : 
-                w += 1
-        if w == max :
-            return ["l", tab.index(i)]
-    w = 0 
-    for i in range(3):
-        w = 0 
-        for j in range(3):
-            if tab[j][i] == ally:
-                w = 0
-            if tab[j][i] == enn:
-                w += 1
-        if w == max :
-            return ["c",i]
-    w = 0 
-    for i in range(3):
-        if tab[i][i] == enn : 
-            w +=1
-        elif tab[i][i] == ally :
-            w = 0
-    if w == max:
-        print("BOUH") 
-        return ["d",1]
-    
-    j =  2
-    w = 0 
-    for i in range(3):
-        if tab[i][j] == enn : 
-            w +=1
-        elif tab[i][j] == ally :
-            w = 0
-        j -=1
-    if w == max:
-        print("BOUH")  
-        return ["d",2]
-        
-    return [" ",0]
-    
-
-def Bot(tab):
-    not_empty = False
-    Def = Check_Winning(tab,2,"X","O")
-    Att = Check_Winning(tab,2,"O","X")
-    
-    if Att[0] != " " :
-        while not_empty == False:
-            if Att[0] == "l":
-                l = Att[1]
-                c = random.randint(0,2)
-            elif Att [0] == "c":
-                l = random.randint(0,2)
-                c = Att[1]
-            elif  Att[0] == "d":
-                if Att[1] == 1:
-                    l = random.randint(0,2)
-                    c = l
-                elif Att[1] == 2:
-                    l = random.randint(0,2)
-                    c = 2 - l
-            b_play = [l,c]
-            not_empty = check_empty(2,b_play,tab)
-
-    elif Def[0] != " ":
-        while not_empty == False:
-            if Def[0] == "l":
-                l = Def[1]
-                c = random.randint(0,2)
-            elif Def [0] == "c":
-                l = random.randint(0,2)
-                c = Def[1]
-            elif  Def[0] == "d":
-                if Def[1] == 1:
-                    l = random.randint(0,2)
-                    c = l
-                elif Def[1] == 2:
-                    l = random.randint(0,2)
-                    c = 2 - l
-            b_play = [l,c]
-            not_empty = check_empty(2,b_play,tab)
-    else:
-        while not_empty == False :
-            l:int = random.randint(0,2)
-            c:int = random.randint(0,2)
-            b_play = [l,c]
-            not_empty = check_empty(2,b_play,tab)
-    return [l,c]
 
 
 Start(True)
