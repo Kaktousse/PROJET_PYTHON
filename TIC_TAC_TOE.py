@@ -20,24 +20,22 @@ def Tictactoe():
             p_column:int = Ask_int_1_3()-1
             not_empty = check_empty(1,[p_lign,p_column],grid)        
         grid[p_lign][p_column] = "X"
-        Win:bool = Check_Winning(grid,3,"X","O")
+        Win:bool = CheckWinning(grid,"X",3)
         if Win : 
             Winner = "X"
             break
-        end = Check_grid(grid)
-        if end == True : 
+        if Check_grid(grid):
             Winner = "T"
             break
 
         draw(grid)
         p_bot = Bot(grid)
         grid[p_bot[0]][p_bot[1]] = "O"
-        Win:bool = Check_Winning(grid,3,"O","X")
+        Win:bool = CheckWinning(grid,"O",3)
         if Win : 
             Winner = "O"
             break
-        end = Check_grid(grid)
-        if end == True : 
+        if Check_grid(grid):
             Winner = "T"
             break
          
@@ -105,88 +103,88 @@ def Ask_str(sPossibilities: list):
 # --- --- #
 
 
-def Check_Winning(grid,max,ally,enn):
-    w = 0
-    play = True
-
-    RAND = []
-
- 
-    for i in range(3): 
-        w = 0 
-        for j in range(3) :
-            if grid[i][j] == enn:
-                w = 0
-            elif grid[i][j] == ally : 
-                w += 1
-            if grid[i][j] == " ":
-                RAND.append([i,j])
-        if w >= max :
+def GetAvailableTiles(grid) -> list[tuple[int, int]]:
     
-            return play
+    Availabletiles :list  = []
+
+    for lign in range(3) : 
+        for column in range(3) : 
+            if grid[lign][column] == " ":
+                Availabletiles.append([lign,column])
+
+    return Availabletiles
 
 
-    w = 0 
-    for i in range(3):
-        w = 0 
-        for j in range(3):
-            if grid[j][i] == enn:
-                w = 0
-            elif grid[j][i] == ally:
-                w += 1
-            if grid[j][i] == " ":
-                RAND.append([j,i])
-        if w >= max :
+def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int) -> bool:
     
-            return play
+    count = 0
+    for lign in range(3):
+        count = 0
+        for column in range(3):
+            if grid[lign][column] == symbol:
+                count += 1
+        if count == winning_symbol_count: 
+            return True
 
-
-    w = 0
-    for i in range(3):
-        if grid[i][i] == ally : 
-            w +=1
-        elif grid[i][i] == enn :
-            w = 0
-        if grid[i][i] == " " : 
-            RAND.append([i,i])
-    if w >= max:
-
-        return play
-
-    j =  2
-    w = 0 
-    for i in range(3):
-        if grid[i][j] == ally : 
-            w +=1
-        elif grid[i][j] == enn :
-            w = 0
-        if grid[i][j] == " " :
-            RAND.append([i,j])
-        j -=1
-    if w >= max: 
-
-        return play
-    if enn == 5:
-        return RAND
-
+    count = 0
+    for column in range(3):
+        count = 0
+        for lign in range(3):
+            if grid[lign][column] == symbol:
+                count += 1
+        if count == winning_symbol_count:
+            return True
+    
+    count = 0
+    for lign in range(3):
+        column = lign
+        if grid[lign][column] == symbol:
+            count += 1
+    if count == winning_symbol_count:
+        return True
+    
+    count = 0
+    for lign in range(3):
+        column = 2-lign
+        if grid[lign][column] == symbol:
+            count +=1
+    if count == winning_symbol_count:
+        return True
+    
     return False
-    
+
+
+
 # --- Bot --- #
 
+def PlayBot(grid,symbol):
+    Availabletiles = GetAvailableTiles(grid)
+    editedgrid = grid
+    for tile in Availabletiles:
+        editedgrid[tile[0]][tile[1]] = symbol
+        if CheckWinning(editedgrid,symbol,3):
+            editedgrid[tile[0]][tile[1]] = " "
+            return tile
+        else:
+            editedgrid[tile[0]][tile[1]] = " "
+    return False
+
+
+
 def Bot(grid):
-    not_empty = False
-    Def = Check_Winning(grid,2,"X","O")
-    Att = Check_Winning(grid,2,"O","X")
-    rand = Check_Winning(grid,1," ",5)
+
+    Availabletiles = GetAvailableTiles(grid)
+    Att = PlayBot(grid,"O")
+    Def = PlayBot(grid,"X")
+    random_play_index: list = random.randint(0,len(Availabletiles)-1)
     
     if Att != False :
-        b_play = Att
+        return Att
     elif Def != False:
-        b_play = Def
+        return Def
     else:
-        rand_inx = random.randint(0,len(rand)-1)
-        b_play = rand[rand_inx]
-    return b_play
+        random_play = Availabletiles[random_play_index]
+        return random_play
 
 
 # --- Running the Game --- #
