@@ -1,13 +1,13 @@
 
 import random
 
-Grid_length: int = 3
-WINNING_SYMBOL_COUNT: int = 3
+Grid_length: int = 100
+Winning_symbol_count: int = 4
 
 
+import time
 
-
-def Tictactoe(grid):
+def Tictactoe(grid: list[list[str]],Grid_length:int ,Winning_symbol_count:int ):
 
 
     while True:
@@ -17,12 +17,12 @@ def Tictactoe(grid):
         not_empty : bool = False
         while not_empty == False:
             print("Selectionnez la ligne dans laquelle vous voulez jouer")
-            p_lign:int = Ask_int_1_3()-1
+            p_lign:int = Ask_int_max(Grid_length)-1
             print("Selectionnez la colonne dans laquelle vous voulez jouer")
-            p_column:int = Ask_int_1_3()-1
+            p_column:int = Ask_int_max(Grid_length)-1
             not_empty : bool = check_empty(1,[p_lign,p_column],grid)        
         grid[p_lign][p_column] = "X"
-        Win: bool = CheckWinning(grid,"X",3)
+        Win: bool = CheckWinning(grid,"X",Winning_symbol_count)
         if Win : 
             Winner: str = "X"
             break
@@ -31,9 +31,9 @@ def Tictactoe(grid):
             break
 
         draw(grid)
-        p_bot: tuple[int, int] = GetBotMove(grid)
+        p_bot: tuple[int, int] = GetBotMove(grid,Winning_symbol_count)
         grid[p_bot[0]][p_bot[1]] = "O"
-        Win:bool = CheckWinning(grid,"O",3)
+        Win:bool = CheckWinning(grid,"O",Winning_symbol_count)
         if Win : 
             Winner: str = "O"
             break
@@ -53,13 +53,12 @@ def creategrid(Grid_length:int) -> list[list[str]]:
         for column in range(Grid_length):
             new_lign.append(" ")
         grid.append(new_lign)
-    draw(grid,Grid_length)
-
     return grid
 
 
 
-def draw( grid: list[list[str]]):
+def draw(grid: list[list[str]]):
+    return
     Index = []
     Grid_length =  len(grid)
     for i in range(1,Grid_length+1):
@@ -101,12 +100,12 @@ def Check_grid(grid : list[list[str]]) -> bool:
 
 # --- All Ask --- #
 
-def Ask_int_1_3() -> int:
+def Ask_int_max(max) -> int:
     while True :
         given_int:int = Ask_int()
-        if given_int > 0 and given_int < 4: 
+        if given_int > 0 and given_int < max+1: 
             return given_int
-        print("Entrez un chiffre entre 1 et 3.")
+        print("Entrez un chiffre entre 1 et",max,".")
              
 def Ask_int() -> int:
     while True :
@@ -128,78 +127,77 @@ def Ask_str(sPossibilities: list) -> str:
 
 
 def GetAvailableTiles(grid : list[list[str]]) -> list[tuple[int, int]]:
-    
-    Availabletiles :list  = []
 
-    for lign in range(3) : 
-        for column in range(3) : 
+    Availabletiles :list  = []
+    C = len(grid)
+    for lign in range(C) : 
+        for column in range(C) : 
             if grid[lign][column] == " ":
                 Availabletiles.append([lign,column])
 
     return Availabletiles
 
-
+# -- opti -- #
 def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int) -> bool:
-    
+    C = len(grid)
     count:int = 0
-    for lign in range(3):
+    for lign in range(C):
         count:int = 0
-        for column in range(3):
+        for column in range(C):
             if grid[lign][column] == symbol:
                 count += 1
                 if count == winning_symbol_count: 
                     return True
 
     count:int = 0
-    for column in range(3):
+    for column in range(C):
         count:int = 0
-        for lign in range(3):
+        for lign in range(C):
             if grid[lign][column] == symbol:
                 count += 1
                 if count == winning_symbol_count:
                     return True
     
     count:int = 0
-    for lign in range(3):
-        column = lign
-        if grid[lign][column] == symbol:
+    for lign in range(C):
+        if grid[lign][lign] == symbol:
             count += 1
             if count == winning_symbol_count:
                 return True
     
     count:int = 0
-    for lign in range(3):
-        column = 2-lign
+    for lign in range(C):
+        column = (C-1) - lign
         if grid[lign][column] == symbol:
             count +=1
             if count == winning_symbol_count:
                 return True
-    
     return False
 
 
 
 # --- Bot --- #
 
-def PlayBot(grid: list[list[str]],symbol:str) -> tuple[int, int]:
+# --- 17sec ---#
+def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int) -> tuple[int, int]:
     Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid)
     for tile in Availabletiles:
         grid[tile[0]][tile[1]] = symbol
-        if CheckWinning(grid,symbol,3):
+        if CheckWinning(grid,symbol,Winning_symbol_count):
             grid[tile[0]][tile[1]] = " "
             return tile
         
         grid[tile[0]][tile[1]] = " "
-
-    return None, None
-
+    return [None, None]
 
 
-def GetBotMove(grid: list[list[str]]) -> tuple[int, int]:
 
+def GetBotMove(grid: list[list[str]],Winning_symbol_count:int) -> tuple[int, int]:
+    print("IA playing...")
+    start = time.time()
     Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid)
-    Att: tuple[int, int] = PlayBot(grid,"O")
-    Def: tuple[int, int] = PlayBot(grid,"X")
+    Att: tuple[int, int] = PlayBot(grid,"O",Winning_symbol_count)
+    Def: tuple[int, int] = PlayBot(grid,"X",Winning_symbol_count)
     Random_play_index: int = random.randint(0,len(Availabletiles)-1)
     
     if Att != [None, None] :
@@ -208,6 +206,8 @@ def GetBotMove(grid: list[list[str]]) -> tuple[int, int]:
     if Def != [None, None]:
         return Def
 
+    end = time.time()
+    print("Done in " + str(end - start))
     return Availabletiles[Random_play_index]
 
 
@@ -227,14 +227,14 @@ def End(Winner : str,grid: list[list[str]]):
 def Try_again(T:str) -> bool:
     return T != 'N'
 
-def Start(start:bool,Grid_length:int): 
+def Start(start:bool,Grid_length:int,Winning_symbol_count:int): 
     while start == True:
         grid = creategrid(Grid_length)
-        Tictactoe(grid)
+        Tictactoe(grid,Grid_length,Winning_symbol_count)
         print("\n Do you want to retry ?")
         retry:str = Ask_str(['Y','N'])
         start: bool = Try_again(retry)
     print("Game Over")
 
 
-Start(True,Grid_length)
+Start(True,Grid_length,Winning_symbol_count)
