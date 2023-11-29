@@ -1,8 +1,8 @@
 
 import random
 
-Grid_length: int = 100
-Winning_symbol_count: int = 4
+Grid_length: int = 3
+Winning_symbol_count: int = 3
 
 
 import time
@@ -20,9 +20,10 @@ def Tictactoe(grid: list[list[str]],Grid_length:int ,Winning_symbol_count:int ):
             p_lign:int = Ask_int_max(Grid_length)-1
             print("Selectionnez la colonne dans laquelle vous voulez jouer")
             p_column:int = Ask_int_max(Grid_length)-1
-            not_empty : bool = check_empty(1,[p_lign,p_column],grid)        
+            not_empty : bool = check_empty(1,[p_lign,p_column],grid)  
+            p_play = [p_lign,p_column]      
         grid[p_lign][p_column] = "X"
-        Win: bool = CheckWinning(grid,"X",Winning_symbol_count)
+        Win: bool = CheckWinning(grid,"X",Winning_symbol_count,p_play)
         if Win : 
             Winner: str = "X"
             break
@@ -31,9 +32,9 @@ def Tictactoe(grid: list[list[str]],Grid_length:int ,Winning_symbol_count:int ):
             break
 
         draw(grid)
-        p_bot: tuple[int, int] = GetBotMove(grid,Winning_symbol_count)
+        p_bot: tuple[int, int] = GetBotMove(grid,Winning_symbol_count,p_play)
         grid[p_bot[0]][p_bot[1]] = "O"
-        Win:bool = CheckWinning(grid,"O",Winning_symbol_count)
+        Win:bool = CheckWinning(grid,"O",Winning_symbol_count,p_bot)
         if Win : 
             Winner: str = "O"
             break
@@ -58,7 +59,6 @@ def creategrid(Grid_length:int) -> list[list[str]]:
 
 
 def draw(grid: list[list[str]]):
-    return
     Index = []
     Grid_length =  len(grid)
     for i in range(1,Grid_length+1):
@@ -126,48 +126,48 @@ def Ask_str(sPossibilities: list) -> str:
 # --- --- #
 
 
-def GetAvailableTiles(grid : list[list[str]]) -> list[tuple[int, int]]:
-
+def GetAvailableTiles(grid : list[list[str]],Checked_tiles:list[int,int,int,int]) -> list[tuple[int, int]]:
     Availabletiles :list  = []
-    C = len(grid)
-    for lign in range(C) : 
-        for column in range(C) : 
+
+    for lign in range(Checked_tiles[0],Checked_tiles[1]) : 
+        for column in range(Checked_tiles[2],Checked_tiles[3]) : 
             if grid[lign][column] == " ":
                 Availabletiles.append([lign,column])
-
     return Availabletiles
 
-# -- opti -- #
-def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int) -> bool:
+
+def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int,player_play:tuple[int,int]) -> bool:
     C = len(grid)
+
+    minimum = player_play[0] - winning_symbol_count
+    maximum = player_play[0] + winning_symbol_count
+
+    lign = player_play[0]
     count:int = 0
-    for lign in range(C):
-        count:int = 0
-        for column in range(C):
-            if grid[lign][column] == symbol:
-                count += 1
-                if count == winning_symbol_count: 
-                    return True
+    for column in range(minimum,maximum):
+        if grid[lign][column] == symbol:
+            count += 1
+            if count == winning_symbol_count: 
+                return True
+
+    column = player_play[1]
+    count:int = 0
+    for lign in range(minimum,maximum):
+        if grid[lign][column] == symbol:
+            count += 1
+            if count == winning_symbol_count:
+                return True
 
     count:int = 0
-    for column in range(C):
-        count:int = 0
-        for lign in range(C):
-            if grid[lign][column] == symbol:
-                count += 1
-                if count == winning_symbol_count:
-                    return True
-    
-    count:int = 0
-    for lign in range(C):
+    for lign in range(minimum,maximum):
         if grid[lign][lign] == symbol:
             count += 1
             if count == winning_symbol_count:
                 return True
     
     count:int = 0
-    for lign in range(C):
-        column = (C-1) - lign
+    for lign in range(minimum,maximum):
+        column = (maximum-1) - lign
         if grid[lign][column] == symbol:
             count +=1
             if count == winning_symbol_count:
@@ -178,12 +178,18 @@ def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int) 
 
 # --- Bot --- #
 
-# --- 17sec ---#
-def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int) -> tuple[int, int]:
-    Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid)
+
+def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int,player_play:tuple[int,int]) -> tuple[int, int]:
+    Tiles = [0,0,0,0]
+    Tiles[0] = player_play[0] - Winning_symbol_count
+    Tiles[1] = player_play[0] + Winning_symbol_count
+    Tiles[2] = player_play[1] - Winning_symbol_count
+    Tiles[3] = player_play[1] + Winning_symbol_count
+
+    Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid,Tiles)
     for tile in Availabletiles:
         grid[tile[0]][tile[1]] = symbol
-        if CheckWinning(grid,symbol,Winning_symbol_count):
+        if CheckWinning(grid,symbol,Winning_symbol_count,player_play):
             grid[tile[0]][tile[1]] = " "
             return tile
         
@@ -192,12 +198,13 @@ def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int) -> tuple[
 
 
 
-def GetBotMove(grid: list[list[str]],Winning_symbol_count:int) -> tuple[int, int]:
+def GetBotMove(grid: list[list[str]],Winning_symbol_count:int, player_play:tuple[int,int]) -> tuple[int, int]:
     print("IA playing...")
     start = time.time()
-    Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid)
-    Att: tuple[int, int] = PlayBot(grid,"O",Winning_symbol_count)
-    Def: tuple[int, int] = PlayBot(grid,"X",Winning_symbol_count)
+    Tiles = [0,len(grid),0,len(grid)]
+    Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid,Tiles)
+    Att: tuple[int, int] = PlayBot(grid,"O",Winning_symbol_count,player_play)
+    Def: tuple[int, int] = PlayBot(grid,"X",Winning_symbol_count,player_play)
     Random_play_index: int = random.randint(0,len(Availabletiles)-1)
     
     if Att != [None, None] :
