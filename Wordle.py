@@ -3,11 +3,16 @@ import linecache
 import random
 Grid_length = 5
 
-def Wordle(grid:list[list[str]],word:list[str,str,str,str,str]):
+def Wordle(grid:list[list[str]], word:list[str,str,str,str,str]):
     attempt = 0
-    while attempt < 6:
+    answer = []
+    for count in range(len(grid[0])):
+        answer.append(" ")
+    
+    while attempt < len(grid):
         given_word = Ask_str()
-        answer = ["","","","",""]
+        for count in range(len(answer)):
+            answer[count] = " "
         count = 0
         for letter in given_word :
             answer[count] = letter
@@ -41,21 +46,24 @@ def Coloring(original_word:list[str],original_given_word:list[str]):
     word = original_word.copy()
     given_word = original_given_word.copy()    
     answer = ["","","","",""]
+    letters_still = {}
+    for letter in word:
+        letters_still[letter] = 0
+    for letter in word:
+        letters_still[letter] += 1
+
     for count in range(len(given_word)):
-        find = False
         if given_word[count] == word[count]:
-            answer[count] = "\033[94m"+ given_word[count] + "\033[0m"
-            word[count] = " "
+            answer[count] = "\033[94m" + given_word[count] + "\033[0m"
+            letters_still[given_word[count]] -= 1
             given_word[count] = " "
-            find = True
-        else:
-            for count2 in range(len(given_word)):
-                if given_word[count] == word[count2]:
-                    answer[count] = "\033[93m" + given_word[count] + "\033[0m"
-                    word[count2] = " "
-                    given_word[count] = " "
-                    find = True
-        if find == False:
+
+    for count in range(len(given_word)):
+        if given_word[count] in letters_still and letters_still[given_word[count]] > 0:
+            answer[count] = "\033[93m" + given_word[count] + "\033[0m"
+            letters_still[given_word[count]] -= 1
+            given_word[count] = " "
+        elif given_word[count] != " ":
             answer[count] = "\033[90m" + given_word[count] + "\033[0m"        
 
     return answer
@@ -89,7 +97,9 @@ def Drawword(word:list[str,str,str,str,str]) -> bool:
 
 
 def Createword():
-    raw_word = linecache.getline("mot.txt", random.randint(1,40))
+    with open(r"WORD.txt", 'r') as word_line:
+        lines = len(word_line.readlines())
+    raw_word = linecache.getline("mot.txt", random.randint(1,lines))
     word = ["","","","",""]
     count = 0
     for letter in raw_word:
@@ -103,9 +113,20 @@ def Ask_str() -> str:
     while True:
         print("Choissiez un mot de 5 lettres")
         given_input:str = input(": ")
-        if given_input.isalpha():   
-            if len(given_input) == 5:
-                return given_input
+        if given_input.isalpha():
+            existing = Search_str(given_input)
+            if existing == True:   
+                if len(given_input) == 5:
+                    return given_input
+
+def Search_str(given_input:str) -> bool:
+    all_words = []
+    with open(r"WORD.txt", 'r') as file:
+        lines = len(word_line.readlines())
+        for i in range(0,lines):
+            all_words.append(file.getline(i))
+
+
 
 def Ask_retry(sPossibilities: list[str,str]) -> bool:
     while True:

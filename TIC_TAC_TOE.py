@@ -137,14 +137,20 @@ def GetAvailableTiles(grid : list[list[str]],Checked_tiles:list[int,int,int,int]
 
 
 def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int,player_play:tuple[int,int]) -> bool:
+    
     C = len(grid)
 
     minimum = player_play[0] - winning_symbol_count
     maximum = player_play[0] + winning_symbol_count
 
+    if minimum < 0:
+        minimum = 0
+    if maximum > len(grid)-1:
+        maximum = len(grid)-1
+    
     lign = player_play[0]
     count:int = 0
-    for column in range(minimum,maximum):
+    for column in range(minimum,maximum+1):
         if grid[lign][column] == symbol:
             count += 1
             if count == winning_symbol_count: 
@@ -152,22 +158,22 @@ def CheckWinning(grid: list[list[str]], symbol: str, winning_symbol_count: int,p
 
     column = player_play[1]
     count:int = 0
-    for lign in range(minimum,maximum):
+    for lign in range(minimum,maximum+1):
         if grid[lign][column] == symbol:
             count += 1
             if count == winning_symbol_count:
                 return True
 
     count:int = 0
-    for lign in range(minimum,maximum):
+    for lign in range(minimum,maximum+1):
         if grid[lign][lign] == symbol:
             count += 1
             if count == winning_symbol_count:
                 return True
     
     count:int = 0
-    for lign in range(minimum,maximum):
-        column = (maximum-1) - lign
+    for lign in range(minimum,maximum+1):
+        column = (maximum) - lign
         if grid[lign][column] == symbol:
             count +=1
             if count == winning_symbol_count:
@@ -186,9 +192,20 @@ def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int,player_pla
     Tiles[2] = player_play[1] - Winning_symbol_count
     Tiles[3] = player_play[1] + Winning_symbol_count
 
+    if Tiles[0]< 0:
+        Tiles[0] = 0 
+    if Tiles[2]< 0:
+        Tiles[2] = 0
+    if Tiles[1] > len(grid):
+        Tiles[1] = len(grid)
+    if Tiles[3] > len(grid):
+        Tiles[3] = len(grid)
+
     Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid,Tiles)
+
     for tile in Availabletiles:
         grid[tile[0]][tile[1]] = symbol
+
         if CheckWinning(grid,symbol,Winning_symbol_count,player_play):
             grid[tile[0]][tile[1]] = " "
             return tile
@@ -207,6 +224,7 @@ def GetBotMove(grid: list[list[str]],Winning_symbol_count:int, player_play:tuple
     Def: tuple[int, int] = PlayBot(grid,"X",Winning_symbol_count,player_play)
     Random_play_index: int = random.randint(0,len(Availabletiles)-1)
     
+    print(Att,Def)
     if Att != [None, None] :
         return Att
     
