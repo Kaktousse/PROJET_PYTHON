@@ -13,12 +13,12 @@ def Tictactoe(grid: list[list[str]],Grid_length:int ,Winning_symbol_count:int ):
     while True:
         
         draw(grid)
-        print("Joueur 1 : ")
+        print("Player 1 : ")
         not_empty : bool = False
         while not_empty == False:
-            print("Selectionnez la ligne dans laquelle vous voulez jouer")
+            print("Choose the lign where you want to play")
             p_lign:int = Ask_int_max(Grid_length)-1
-            print("Selectionnez la colonne dans laquelle vous voulez jouer")
+            print("Choose the column where you want to play")
             p_column:int = Ask_int_max(Grid_length)-1
             not_empty : bool = check_empty(1,[p_lign,p_column],grid)  
             p_play = [p_lign,p_column]      
@@ -86,8 +86,8 @@ def check_empty(player: int,play: list,grid: list[list[str]]) -> bool:
             if player == 1:
                 print("\n")
                 draw(grid)
-                print("Joueur ",player," :")
-                print("Veuillez selectionner une case libre : ")
+                print("Player ",player," :")
+                print("Please choose an empty tile : ")
             return False
             
 def Check_grid(grid : list[list[str]]) -> bool:
@@ -105,11 +105,11 @@ def Ask_int_max(max) -> int:
         given_int:int = Ask_int()
         if given_int > 0 and given_int < max+1: 
             return given_int
-        print("Entrez un chiffre entre 1 et",max,".")
+        print("Choose a number between 1 and",max,".")
              
 def Ask_int() -> int:
     while True :
-        given_int: str = input("Choississez un chiffre : ")
+        given_int: str = input("Choose a number : ")
         if given_int.isdigit():
                 given_int :int = int(given_int)
                 return given_int
@@ -200,13 +200,12 @@ def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int,player_pla
         Tiles[1] = len(grid)
     if Tiles[3] > len(grid):
         Tiles[3] = len(grid)
-
+    
     Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid,Tiles)
 
     for tile in Availabletiles:
         grid[tile[0]][tile[1]] = symbol
-
-        if CheckWinning(grid,symbol,Winning_symbol_count,player_play):
+        if CheckWinning(grid,symbol,Winning_symbol_count,[tile[0],tile[1]]):
             grid[tile[0]][tile[1]] = " "
             return tile
         
@@ -217,7 +216,6 @@ def PlayBot(grid: list[list[str]],symbol:str,Winning_symbol_count:int,player_pla
 
 def GetBotMove(grid: list[list[str]],Winning_symbol_count:int, player_play:tuple[int,int]) -> tuple[int, int]:
     print("IA playing...")
-    start = time.time()
     Tiles = [0,len(grid),0,len(grid)]
     Availabletiles: list[tuple[int,int]] = GetAvailableTiles(grid,Tiles)
     Att: tuple[int, int] = PlayBot(grid,"O",Winning_symbol_count,player_play)
@@ -230,9 +228,7 @@ def GetBotMove(grid: list[list[str]],Winning_symbol_count:int, player_play:tuple
     
     if Def != [None, None]:
         return Def
-
-    end = time.time()
-    print("Done in " + str(end - start))
+    
     return Availabletiles[Random_play_index]
 
 

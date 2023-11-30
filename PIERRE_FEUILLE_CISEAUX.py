@@ -5,9 +5,9 @@ import random
 def Shifumi():
 
     tab_result : list = [  
-                            ["Tie"      , "You win"  , "You loose" ],
-                            ["You loose", "Tie"      , "You win"   ],
-                            ["You win"  , "You loose", "Tie"       ]
+                            ["tie"      , "you win"  , "you loose" ],
+                            ["you loose", "tie"      , "you win"   ],
+                            ["you win"  , "you loose", "tie"       ]
                         ]
     
     tab_points : list = [
@@ -27,8 +27,8 @@ def Shifumi():
         Bot:int = random.randint(0,2)
         print("\n Choose : Rock (1), Paper (2) or Scissors (3) .")
         player:int = Ask_int_1_3() - 1
-        Winner = tab_result[player][Bot]
-        Wins[tab_points[player][Bot]] += 1
+        Winner = tab_result[Bot][player]
+        Wins[tab_points[Bot][player]] += 1
         print(choice[Bot],"vs",choice[player],Winner)
     
     Results:str = Win(Wins)

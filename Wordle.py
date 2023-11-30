@@ -99,7 +99,7 @@ def Drawword(word:list[str,str,str,str,str]) -> bool:
 def Createword():
     with open(r"WORD.txt", 'r') as word_line:
         lines = len(word_line.readlines())
-    raw_word = linecache.getline("mot.txt", random.randint(1,lines))
+    raw_word = linecache.getline("WORD.txt", random.randint(1,lines))
     word = ["","","","",""]
     count = 0
     for letter in raw_word:
@@ -111,7 +111,7 @@ def Createword():
 
 def Ask_str() -> str:
     while True:
-        print("Choissiez un mot de 5 lettres")
+        print("Choose a 5 letter word")
         given_input:str = input(": ")
         if given_input.isalpha():
             existing = Search_str(given_input)
@@ -122,9 +122,15 @@ def Ask_str() -> str:
 def Search_str(given_input:str) -> bool:
     all_words = []
     with open(r"WORD.txt", 'r') as file:
-        lines = len(word_line.readlines())
+        lines = len(file.readlines())
         for i in range(0,lines):
-            all_words.append(file.getline(i))
+            line = linecache.getline("WORD.txt",i)
+            all_words.append(line.replace('\n',''))
+        for compare in all_words:
+            if given_input == compare:
+                return True
+        print("Choose an existing word")
+        return False
 
 
 
